@@ -1,0 +1,28 @@
+"AppBuild"
+{
+	"AppID"	"0000000"
+	"Desc"	"Sine si Sosele 1.0.0"
+	"ContentRoot"	"..\out\"
+	"BuildOutput"	"..\steam_output\"
+	"Depots"
+	{
+		"0000001"
+		{
+			"FileMapping"
+			{
+				"LocalPath"	"win-unpacked\*"
+				"DepotPath"	"."
+				"recursive"	"1"
+			}
+		}
+		"0000002"
+		{
+			"FileMapping"
+			{
+				"LocalPath"	"mac-universal\*"
+				"DepotPath"	"."
+				"recursive"	"1"
+			}
+		}
+	}
+}
