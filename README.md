@@ -1,13 +1,17 @@
 <div align="center">
 
-<img src="docs/media/gameplay.gif" alt="Sine si Sosele: masini, trenuri si camioane in miscare intr-un oras cu rau si cale ferata" width="760">
+<a href="https://seress26.github.io/Joc-Sine-si-Sosele/joaca/"><img src="docs/media/gameplay.gif" alt="Sine si Sosele: masini, trenuri si camioane in miscare intr-un oras cu rau si cale ferata. Click ca sa joci demo-ul." width="760"></a>
 
 # Sine si Sosele
 
 **Masini, trenuri si camioane intr-un singur oras.**<br>
 Joc minimalist de strategie si trafic, pentru calculator si telefon.
 
-### [▶ Joaca gratuit in browser](https://seress26.github.io/Joc-Sine-si-Sosele/joaca/) &nbsp;·&nbsp; [Pagina jocului](https://seress26.github.io/Joc-Sine-si-Sosele/) &nbsp;·&nbsp; [English](#english)
+<a href="https://seress26.github.io/Joc-Sine-si-Sosele/joaca/"><img src="https://img.shields.io/badge/%E2%96%B6%20JOACA%20DEMO--UL-versiunea%201.0%20%C2%B7%20gratuit%20in%20browser-E8604C?style=for-the-badge" alt="Joaca demo-ul, versiunea 1.0, gratuit in browser" height="40"></a>
+
+Merge pe calculator, telefon si tableta. Fara descarcare, fara instalare, fara cont.
+
+[Pagina jocului](https://seress26.github.io/Joc-Sine-si-Sosele/) &nbsp;·&nbsp; [English](#english)
 
 ![Versiunea 1.0](https://img.shields.io/badge/versiunea-1.0-E8604C?style=flat-square)
 ![Platforme](https://img.shields.io/badge/platforme-browser%20%C2%B7%20Windows%20%C2%B7%20macOS%20%C2%B7%20iOS%20%C2%B7%20Android-3E7BD2?style=flat-square)
@@ -85,7 +89,7 @@ Rauri, lacuri, munti si mare. Fa 80 de livrari intr-un oras ca sa-l deblochezi p
 
 | | |
 |---|---|
-| **In browser** | [Joaca acum](https://seress26.github.io/Joc-Sine-si-Sosele/joaca/), fara instalare si fara cont. Sau descarca [`index.html`](index.html) si deschide-l cu dublu-click. |
+| **In browser** | [Joaca demo-ul](https://seress26.github.io/Joc-Sine-si-Sosele/joaca/), fara descarcare, fara instalare si fara cont. Sau descarca [`index.html`](index.html) si deschide-l cu dublu-click. |
 | **Pe telefon** | Deschide [jocul](https://seress26.github.io/Joc-Sine-si-Sosele/joaca/) pe telefon, apoi *Add to Home Screen* (iPhone) sau *Install app* (Android). Merge si fara internet. |
 | **Pe Steam** | Versiunea pentru Windows si macOS este in pregatire. Apasa ⭐ *Star* sau *Watch* pe acest repo ca sa afli cand apare. |
 
@@ -134,7 +138,7 @@ share one growing town. Draw roads and railways, guard level crossings with barr
 tame junctions with traffic lights and roundabouts, and decide which trains and trucks serve each depot.
 Five Romanian cities, English and Romanian, playable on computer and phone, offline too.
 
-**[▶ Play free in your browser](https://seress26.github.io/Joc-Sine-si-Sosele/joaca/)** · [Game page](https://seress26.github.io/Joc-Sine-si-Sosele/?lang=en) · Coming to Steam (Windows, macOS).
+**[▶ Play the free demo in your browser](https://seress26.github.io/Joc-Sine-si-Sosele/joaca/)** · [Game page](https://seress26.github.io/Joc-Sine-si-Sosele/?lang=en) · Coming to Steam (Windows, macOS).
 
 ## Licenta / License
 
