@@ -1,0 +1,733 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sine si Sosele - joc de trafic cu masini, trenuri si camioane</title>
+<meta name="description" content="Traseaza drumuri si cai ferate intr-un oras care creste. Masini, trenuri si camioane impart aceleasi strazi. Joaca gratuit in browser, pe calculator sau pe telefon.">
+<meta name="theme-color" content="#E2E7DB">
+<link rel="canonical" href="https://seress26.github.io/Joc-Sine-si-Sosele/">
+<link rel="icon" type="image/png" href="joaca/icon-192.png">
+<link rel="apple-touch-icon" href="joaca/icon-180.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Sine si Sosele">
+<meta property="og:title" content="Sine si Sosele">
+<meta property="og:description" content="Masini, trenuri si camioane intr-un singur oras. Joc minimalist de trafic, gratuit in browser.">
+<meta property="og:url" content="https://seress26.github.io/Joc-Sine-si-Sosele/">
+<meta property="og:image" content="https://seress26.github.io/Joc-Sine-si-Sosele/media/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preload" href="fonts/big-shoulders-display-latin-900-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/barlow-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"VideoGame","name":"Sine si Sosele","url":"https://seress26.github.io/Joc-Sine-si-Sosele/",
+ "image":"https://seress26.github.io/Joc-Sine-si-Sosele/media/og.jpg","description":"Joc minimalist de trafic: masini, trenuri si camioane intr-un oras care creste.",
+ "genre":["Strategy","Puzzle","Simulation"],"gamePlatform":["Web browser","Windows","macOS","iOS","Android"],"inLanguage":["ro","en"],
+ "applicationCategory":"Game","operatingSystem":"Any","author":{"@type":"Person","name":"SereSS26","url":"https://github.com/SereSS26"},
+ "offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}}
+</script>
+<style>
+@font-face{font-family:'Big Shoulders Display';font-weight:800;font-display:swap;src:url(fonts/big-shoulders-display-latin-800-normal.woff2) format('woff2');}
+@font-face{font-family:'Big Shoulders Display';font-weight:900;font-display:swap;src:url(fonts/big-shoulders-display-latin-900-normal.woff2) format('woff2');}
+@font-face{font-family:'Barlow';font-weight:500;font-display:swap;src:url(fonts/barlow-latin-500-normal.woff2) format('woff2');}
+@font-face{font-family:'Barlow';font-weight:600;font-display:swap;src:url(fonts/barlow-latin-600-normal.woff2) format('woff2');}
+@font-face{font-family:'Barlow';font-weight:700;font-display:swap;src:url(fonts/barlow-latin-700-normal.woff2) format('woff2');}
+
+:root{
+  /* culorile jocului */
+  --land:#E2E7DB; --fog:#CFD4C8; --edge:#C3CABB; --paper:#F7F8F4; --white:#FFFFFF;
+  --ink:#22262D; --ink-2:#3A3F48; --muted:#555D69;
+  --red:#E8604C; --red-d:#B9493A; --blue:#3E7BD2; --yellow:#E6A823; --teal:#2FA38D; --purple:#9265CC;
+  --rail:#353A45; --tie:#8A8F96; --water:#9CC4DC; --crate:#C99B5B; --crate-d:#8E6A38; --depot:#4A505C; --green:#3DBE6A;
+  --display:'Big Shoulders Display',Impact,'Arial Narrow',sans-serif;
+  --ui:Barlow,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --radius:20px; --radius-s:12px;
+  --shadow:0 1px 2px rgba(34,38,45,.06),0 14px 40px rgba(34,38,45,.12);
+  --shadow-s:0 1px 2px rgba(34,38,45,.06),0 6px 18px rgba(34,38,45,.08);
+  --max:1180px; --gutter:clamp(16px,4vw,40px);
+  color-scheme:light;
+}
+*,*::before,*::after{box-sizing:border-box;}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;}
+body{margin:0;background:var(--land);color:var(--ink);font-family:var(--ui);font-weight:500;font-size:18px;line-height:1.55;overflow-x:hidden;}
+img,video,svg{display:block;max-width:100%;}
+img{height:auto;}
+a{color:inherit;}
+p{margin:0;}
+h1,h2,h3{font-family:var(--display);font-weight:900;text-transform:uppercase;letter-spacing:.005em;line-height:.9;margin:0;}
+:focus-visible{outline:3px solid var(--blue);outline-offset:3px;border-radius:6px;}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 var(--gutter);}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
+.skip{position:absolute;left:12px;top:-60px;background:var(--ink);color:#fff;padding:10px 16px;border-radius:10px;z-index:100;text-decoration:none;font-weight:700;}
+.skip:focus{top:12px;}
+
+/* harta cu puncte, ca in joc */
+.dots{background-image:radial-gradient(circle,rgba(34,38,45,.09) 1.2px,transparent 1.6px);background-size:26px 26px;}
+
+/* ---------------- bara de sus */
+.nav{position:sticky;top:0;z-index:50;background:rgba(226,231,219,.86);backdrop-filter:saturate(1.2) blur(12px);-webkit-backdrop-filter:saturate(1.2) blur(12px);border-bottom:1px solid transparent;transition:border-color .2s,box-shadow .2s;}
+.nav.scrolled{border-bottom-color:var(--edge);box-shadow:0 6px 20px rgba(34,38,45,.06);}
+.nav .wrap{display:flex;align-items:center;gap:18px;height:68px;}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex:none;}
+.brand img{width:36px;height:36px;border-radius:9px;}
+.brand span{font-family:var(--display);font-weight:900;text-transform:uppercase;font-size:24px;line-height:1;letter-spacing:.01em;}
+.brand span b{color:var(--red);font-weight:900;}
+.links{display:flex;gap:4px;margin-left:auto;}
+.links a{text-decoration:none;font-weight:600;font-size:16px;color:var(--ink-2);padding:8px 12px;border-radius:999px;}
+.links a:hover{background:rgba(34,38,45,.06);color:var(--ink);}
+.lang{display:flex;background:rgba(34,38,45,.07);border-radius:999px;padding:3px;flex:none;}
+.lang button{border:0;background:transparent;font:700 13px/1 var(--ui);letter-spacing:.06em;color:var(--muted);padding:8px 11px;border-radius:999px;cursor:pointer;min-width:40px;min-height:32px;}
+.lang button[aria-pressed="true"]{background:var(--white);color:var(--ink);box-shadow:var(--shadow-s);}
+.nav .btn{height:42px;padding:0 18px;font-size:16px;}
+
+/* ---------------- butoane */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;height:54px;padding:0 26px;border-radius:999px;font:700 18px/1 var(--ui);text-decoration:none;border:0;cursor:pointer;transition:transform .15s,background .15s,box-shadow .15s;white-space:nowrap;}
+.btn svg{width:18px;height:18px;flex:none;}
+.btn-main{background:var(--ink);color:#fff;box-shadow:0 8px 20px rgba(34,38,45,.22);}
+.btn-main:hover{background:#000;transform:translateY(-1px);box-shadow:0 12px 26px rgba(34,38,45,.28);}
+.btn-red{background:var(--red);color:#fff;box-shadow:0 8px 20px rgba(232,96,76,.32);}
+.btn-red:hover{background:#D9533F;transform:translateY(-1px);}
+.btn-ghost{background:var(--white);color:var(--ink);box-shadow:var(--shadow-s);}
+.btn-ghost:hover{transform:translateY(-1px);}
+.btn-soon{background:transparent;color:var(--ink-2);border:2px dashed #A9B0A2;cursor:default;}
+.tag{display:inline-flex;align-items:center;gap:6px;font:700 12px/1 var(--ui);letter-spacing:.08em;text-transform:uppercase;padding:6px 10px;border-radius:999px;background:var(--white);color:var(--ink-2);}
+.tag i{width:8px;height:8px;border-radius:50%;background:var(--green);display:block;}
+
+/* ---------------- hero */
+.hero{position:relative;padding:clamp(28px,5vw,64px) 0 0;overflow:hidden;}
+.hero-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(24px,4vw,56px);align-items:center;}
+.eyebrow{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;}
+.title{font-size:clamp(78px,10.4vw,150px);line-height:.8;}
+.title span{display:block;}
+.title .r{color:var(--red);}
+.lead{font-size:clamp(18px,1.6vw,21px);color:var(--ink-2);margin-top:22px;max-width:520px;}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px;}
+.meta{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:22px;color:var(--muted);font-size:15px;font-weight:600;}
+.meta span{display:inline-flex;align-items:center;gap:7px;}
+.meta svg{width:17px;height:17px;}
+.board{position:relative;border-radius:var(--radius);background:var(--land);box-shadow:0 0 0 1px var(--edge),var(--shadow);overflow:hidden;aspect-ratio:16/9;}
+.board video,.board img{width:100%;height:100%;object-fit:cover;}
+.vbtn{position:absolute;right:12px;bottom:12px;width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.92);box-shadow:var(--shadow-s);display:grid;place-items:center;cursor:pointer;color:var(--ink);}
+.vbtn svg{width:18px;height:18px;}
+.vcap{position:absolute;left:12px;bottom:12px;background:rgba(255,255,255,.92);border-radius:999px;padding:7px 12px;font:600 13px/1 var(--ui);color:var(--ink-2);box-shadow:var(--shadow-s);}
+
+/* bara cu cifre */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow-s);margin-top:clamp(28px,4vw,48px);position:relative;z-index:2;}
+.stat{padding:20px 22px;border-left:1px solid #E6E9E1;}
+.stat:first-child{border-left:0;}
+.stat b{display:block;font-family:var(--display);font-weight:900;font-size:clamp(40px,4.4vw,56px);line-height:.9;}
+.stat span{font-size:15px;color:var(--muted);font-weight:600;line-height:1.3;display:block;margin-top:4px;}
+.stat:nth-child(1) b{color:var(--red);} .stat:nth-child(2) b{color:var(--blue);} .stat:nth-child(3) b{color:var(--yellow);} .stat:nth-child(4) b{color:var(--teal);}
+
+/* ---------------- cale ferata cu tren (decor) */
+.track{position:relative;height:64px;margin-top:-6px;overflow:hidden;}
+.track::before{content:"";position:absolute;left:0;right:0;top:26px;height:14px;background:repeating-linear-gradient(90deg,var(--tie) 0 5px,transparent 5px 17px);opacity:.9;}
+.track::after{content:"";position:absolute;left:0;right:0;top:31px;height:4px;background:var(--rail);border-radius:2px;}
+.train{position:absolute;top:18px;left:0;z-index:1;animation:ride 16s linear infinite;will-change:transform;}
+.train svg{height:30px;width:auto;}
+@keyframes ride{from{transform:translateX(-340px);}to{transform:translateX(calc(100vw + 40px));}}
+
+/* ---------------- sectiuni */
+section{scroll-margin-top:76px;}
+.sec{padding:clamp(56px,8vw,104px) 0;}
+.sec-alt{background:var(--paper);}
+.sec-dark{background:var(--ink);color:#fff;}
+.head{max-width:720px;margin-bottom:clamp(28px,4vw,44px);}
+.head h2{font-size:clamp(46px,6vw,76px);}
+.head p{font-size:clamp(17px,1.5vw,20px);color:var(--muted);margin-top:14px;}
+.sec-dark .head p{color:#B8BEC7;}
+.kicker{display:block;font:700 14px/1 var(--ui);letter-spacing:.12em;text-transform:uppercase;color:var(--red);margin-bottom:14px;}
+
+/* trei feluri de trafic */
+.pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+.pill{background:var(--white);border-radius:var(--radius);padding:0 0 26px;box-shadow:var(--shadow-s);overflow:hidden;}
+.pill .art{height:150px;background:var(--land);position:relative;border-bottom:1px solid #E6E9E1;}
+.pill .art svg{position:absolute;inset:0;width:100%;height:100%;}
+.pill h3{font-size:40px;margin:22px 24px 8px;}
+.pill p{margin:0 24px;color:var(--ink-2);}
+.pill .fact{margin:16px 24px 0;display:inline-flex;gap:8px;align-items:center;font:700 13px/1 var(--ui);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);}
+.pill .fact i{width:10px;height:10px;border-radius:3px;display:block;}
+
+/* caracteristici */
+.feats{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+.feat{background:var(--white);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-s);display:flex;flex-direction:column;transition:transform .2s,box-shadow .2s;}
+.feat:hover{transform:translateY(-3px);box-shadow:var(--shadow);}
+.feat img{aspect-ratio:3/2;width:100%;object-fit:cover;background:var(--land);}
+.feat div{padding:20px 22px 24px;}
+.feat h3{font-size:30px;margin-bottom:8px;}
+.feat p{color:var(--ink-2);font-size:17px;}
+
+/* orase */
+.cities{display:flex;flex-wrap:wrap;gap:18px;justify-content:center;}
+.city{flex:1 1 340px;max-width:376px;background:var(--white);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-s);}
+.city img{aspect-ratio:16/10;width:100%;object-fit:cover;background:var(--land);}
+.city div{padding:18px 22px 22px;}
+.city h3{font-size:36px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.diff{display:flex;gap:4px;}
+.diff i{width:9px;height:9px;border-radius:50%;background:#D5DAD0;display:block;}
+.diff i.on{background:var(--red);}
+.city p{color:var(--ink-2);font-size:17px;margin-top:8px;}
+.city small{display:block;margin-top:12px;font:700 12px/1.3 var(--ui);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);}
+
+/* cum se joaca */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;counter-reset:s;}
+.step{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:var(--radius);padding:24px;}
+.step b{display:block;font-family:var(--display);font-weight:900;font-size:56px;line-height:.85;color:var(--red);}
+.step h3{font-size:28px;margin:14px 0 8px;}
+.step p{color:#C9CED6;font-size:17px;}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px;}
+.ctl{border:1px solid rgba(255,255,255,.12);border-radius:var(--radius);padding:22px 24px;}
+.ctl h3{font-size:24px;margin-bottom:12px;color:#fff;}
+.ctl ul{list-style:none;margin:0;padding:0;display:grid;gap:9px;}
+.ctl li{display:flex;gap:12px;align-items:baseline;color:#C9CED6;font-size:16px;}
+kbd{font:700 13px/1 var(--ui);background:#fff;color:var(--ink);border-radius:7px;padding:5px 8px;box-shadow:0 2px 0 #9097A1;white-space:nowrap;min-width:28px;text-align:center;display:inline-block;}
+
+/* galerie */
+.gallery{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:1fr;gap:14px;}
+.gallery button{padding:0;border:0;background:var(--land);border-radius:var(--radius-s);overflow:hidden;cursor:zoom-in;box-shadow:var(--shadow-s);position:relative;aspect-ratio:16/9;}
+.gallery button:first-child{grid-column:span 2;grid-row:span 2;aspect-ratio:auto;}
+.gallery img{width:100%;height:100%;object-fit:cover;transition:transform .35s;}
+.gallery button:hover img{transform:scale(1.03);}
+.gallery span{position:absolute;left:10px;bottom:10px;background:rgba(255,255,255,.92);border-radius:999px;padding:6px 10px;font:700 12px/1 var(--ui);letter-spacing:.04em;color:var(--ink-2);}
+dialog.lb{border:0;padding:0;background:transparent;max-width:min(1400px,94vw);width:94vw;}
+dialog.lb::backdrop{background:rgba(20,22,26,.86);}
+.lb figure{margin:0;position:relative;}
+.lb img{width:100%;height:auto;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.4);}
+.lb figcaption{color:#fff;text-align:center;margin-top:12px;font-weight:600;}
+.lb .x,.lb .pv,.lb .nx{position:absolute;width:48px;height:48px;border-radius:50%;border:0;background:#fff;color:var(--ink);display:grid;place-items:center;cursor:pointer;box-shadow:var(--shadow-s);}
+.lb .x{top:-14px;right:-14px;}
+.lb .pv{left:-18px;top:calc(50% - 38px);} .lb .nx{right:-18px;top:calc(50% - 38px);}
+.lb svg{width:20px;height:20px;}
+
+/* platforme */
+.plat{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(24px,4vw,56px);align-items:center;}
+.pcards{display:grid;gap:14px;}
+.pcard{background:var(--white);border-radius:var(--radius);padding:22px 24px;box-shadow:var(--shadow-s);display:grid;grid-template-columns:48px 1fr;gap:4px 16px;align-items:start;}
+.pcard .ic{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;grid-row:span 3;}
+.pcard .ic svg{width:24px;height:24px;}
+.pcard h3{font-size:30px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.pcard p{color:var(--ink-2);font-size:17px;}
+.pcard .row{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;align-items:center;}
+.pcard .row .btn{height:46px;font-size:16px;padding:0 20px;}
+.pcard ol{margin:8px 0 0;padding-left:20px;color:var(--ink-2);font-size:16px;}
+.small-link{font-weight:700;font-size:15px;color:var(--ink-2);}
+.phones{position:relative;min-height:520px;}
+.phone{position:absolute;background:#1B1E23;border-radius:38px;padding:10px;box-shadow:0 30px 60px rgba(34,38,45,.28),inset 0 0 0 2px #3A3F48;}
+.phone img{border-radius:29px;width:100%;height:100%;object-fit:cover;}
+.phone.land{width:92%;aspect-ratio:1266/585;left:0;top:30px;border-radius:32px;}
+.phone.land img{border-radius:24px;}
+.phone.port{width:35%;aspect-ratio:585/1266;right:2%;bottom:0;}
+.qrbox{position:absolute;left:4%;bottom:6px;background:var(--white);border-radius:18px;padding:14px;box-shadow:var(--shadow);display:flex;gap:14px;align-items:center;max-width:300px;}
+.qrbox .qr{width:104px;height:104px;flex:none;}
+.qrbox p{font-size:15px;line-height:1.35;color:var(--ink-2);font-weight:600;}
+
+/* ce urmeaza */
+.road{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;position:relative;}
+.ri{background:var(--white);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow-s);border-top:6px solid var(--c);}
+.ri h3{font-size:26px;margin:10px 0 6px;}
+.ri p{color:var(--ink-2);font-size:16px;}
+
+/* final */
+.final{text-align:center;}
+.final h2{font-size:clamp(52px,8vw,112px);}
+.final h2 span{display:block;}
+.final h2 span+span{color:var(--red);}
+.final .cta{justify-content:center;}
+footer{background:var(--ink);color:#B8BEC7;padding:34px 0 40px;font-size:15px;}
+footer .wrap{display:flex;flex-wrap:wrap;gap:14px 28px;align-items:center;justify-content:space-between;}
+footer .brand span{color:#fff;}
+footer nav{display:flex;flex-wrap:wrap;gap:6px 20px;}
+footer a{color:#fff;text-decoration:none;font-weight:600;}
+footer a:hover{text-decoration:underline;}
+footer .legal{flex-basis:100%;font-size:13px;color:#8F96A1;}
+
+/* ---------------- ecrane mici */
+@media (max-width:1020px){
+  .links{display:none;}
+  .lang{margin-left:auto;}
+  .hero-grid{grid-template-columns:1fr;}
+    .feats,.pillars{grid-template-columns:repeat(2,1fr);}
+  .steps,.road{grid-template-columns:repeat(2,1fr);}
+  .plat{grid-template-columns:1fr;}
+  .phones{min-height:0;aspect-ratio:1/0.82;}
+}
+@media (max-width:680px){
+  body{font-size:17px;}
+  .nav .wrap{height:60px;gap:10px;}
+  .brand span{font-size:20px;} .brand img{width:32px;height:32px;}
+  .nav .btn{height:38px;padding:0 14px;font-size:15px;}
+  .nav .btn svg{display:none;}
+  .stats{grid-template-columns:1fr 1fr;}
+  .stat:nth-child(3){border-left:0;}
+  .stat:nth-child(n+3){border-top:1px solid #E6E9E1;}
+  .feats,.pillars,.steps,.road,.controls{grid-template-columns:1fr;}
+  .gallery{grid-template-columns:1fr 1fr;grid-auto-rows:auto;gap:10px;}
+  .gallery button:first-child{grid-column:span 2;grid-row:auto;aspect-ratio:16/9;}
+  .cta .btn{flex:1 1 100%;}
+  .phones{aspect-ratio:auto;min-height:0;}
+  .phone{border-radius:26px;padding:7px;}
+  .phone.land{position:relative;width:100%;top:0;border-radius:24px;}
+  .phone.land img{border-radius:18px;}
+  .phone.port{display:none;}
+  .qrbox{display:none;}
+  .lb .pv,.lb .nx{top:auto;bottom:-64px;}
+  .lb .pv{left:calc(50% - 58px);} .lb .nx{right:calc(50% - 58px);}
+  .lb .x{top:-58px;right:0;}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto;}
+  .train{animation:none;transform:translateX(55vw);}
+  *{transition:none!important;}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main" data-i18n="skip">Sari la continut</a>
+
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Sine si Sosele">
+      <img src="joaca/icon-192.png" alt="" width="36" height="36">
+      <span>Sine si <b>Sosele</b></span>
+    </a>
+    <nav class="links" aria-label="Sectiuni">
+      <a href="#joc" data-i18n="navGame">Jocul</a>
+      <a href="#caracteristici" data-i18n="navFeat">Caracteristici</a>
+      <a href="#orase" data-i18n="navCities">Orase</a>
+      <a href="#galerie" data-i18n="navGallery">Galerie</a>
+      <a href="#platforme" data-i18n="navPlat">Platforme</a>
+    </nav>
+    <div class="lang" role="group" aria-label="Limba / Language">
+      <button type="button" data-lang="ro" aria-pressed="true">RO</button>
+      <button type="button" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+    <a class="btn btn-red" href="joaca/"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z"/></svg><span data-i18n="play">Joaca</span></a>
+  </div>
+</header>
+
+<main id="main">
+<!-- ================================================================ HERO -->
+<section class="hero dots" id="top">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div class="hero-text">
+        <div class="eyebrow">
+          <span class="tag"><i></i><span data-i18n="tagFree">Gratuit in browser</span></span>
+          <span class="tag" data-i18n="tagVer">Versiunea 1.0</span>
+        </div>
+        <h1 class="title"><span>Sine si</span><span class="r">Sosele</span></h1>
+        <p class="lead" data-i18n="lead">Traseaza drumuri si cai ferate intr-un oras care creste in fiecare saptamana. Masinile merg la magazine, trenurile si camioanele aduc marfa, iar tu tii totul in miscare.</p>
+        <div class="cta">
+          <a class="btn btn-main" href="joaca/"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z"/></svg><span data-i18n="playFree">Joaca gratuit acum</span></a>
+          <a class="btn btn-ghost" href="#joc" data-i18n="discover">Descopera jocul</a>
+        </div>
+        <div class="meta">
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg><span data-i18n="mPc">Calculator</span></span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2.5"/><path d="M11 18h2"/></svg><span data-i18n="mPhone">Telefon si tableta</span></span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg><span data-i18n="mLang">Romana si engleza</span></span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 9a15 15 0 0 1 20 0M5.5 12.5a10 10 0 0 1 13 0M9 16a5 5 0 0 1 6 0"/><circle cx="12" cy="19.5" r="1" fill="currentColor"/><path d="M3 3l18 18"/></svg><span data-i18n="mOff">Merge si fara internet</span></span>
+        </div>
+      </div>
+      <div class="board" id="board">
+        <video id="vid" muted loop playsinline preload="metadata" poster="media/gameplay-poster.webp" data-i18n-aria="vidAria" aria-label="Filmare din joc: orasul Cluj, cu masini, trenuri si camioane in miscare">
+          <source src="media/gameplay-720.mp4" type="video/mp4" media="(max-width: 820px)">
+          <source src="media/gameplay.mp4" type="video/mp4">
+          <source src="media/gameplay.webm" type="video/webm">
+        </video>
+        <span class="vcap" data-i18n="vidCap">Filmat in joc · Cluj, saptamana 7</span>
+        <button class="vbtn" id="vbtn" type="button" aria-label="Opreste filmarea"><svg viewBox="0 0 24 24" aria-hidden="true"><path id="vico" fill="currentColor" d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg></button>
+      </div>
+    </div>
+    <div class="stats" role="list">
+      <div class="stat" role="listitem"><b>5</b><span data-i18n="s1">orase romanesti</span></div>
+      <div class="stat" role="listitem"><b>3</b><span data-i18n="s2">feluri de vehicule</span></div>
+      <div class="stat" role="listitem"><b>9</b><span data-i18n="s3">bonusuri de ales in fiecare saptamana</span></div>
+      <div class="stat" role="listitem"><b>10</b><span data-i18n="s4">patratele poate sari un pasaj</span></div>
+    </div>
+  </div>
+  <div class="track" aria-hidden="true">
+    <div class="train">
+      <svg viewBox="0 0 330 30"><g>
+        <rect x="0" y="5" width="66" height="20" rx="4" fill="#C99B5B"/><path d="M8 9l16 12M24 9L8 21M42 9l16 12M58 9L42 21" stroke="#8E6A38" stroke-width="2.4"/><rect x="31" y="5" width="4" height="20" fill="#8E6A38"/>
+        <rect x="74" y="5" width="66" height="20" rx="4" fill="#C99B5B"/><path d="M82 9l16 12M98 9L82 21M116 9l16 12M132 9l-16 12" stroke="#8E6A38" stroke-width="2.4"/><rect x="105" y="5" width="4" height="20" fill="#8E6A38"/>
+        <rect x="148" y="5" width="66" height="20" rx="4" fill="#C99B5B"/><path d="M156 9l16 12M172 9l-16 12M190 9l16 12M206 9l-16 12" stroke="#8E6A38" stroke-width="2.4"/><rect x="179" y="5" width="4" height="20" fill="#8E6A38"/>
+        <rect x="222" y="3" width="96" height="24" rx="6" fill="#2B303A"/><rect x="232" y="8" width="44" height="14" rx="3" fill="#4A505C"/><rect x="284" y="7" width="22" height="16" rx="3" fill="#3A3F48"/>
+        <circle cx="318" cy="9" r="3" fill="#F4D35E"/><circle cx="318" cy="21" r="3" fill="#F4D35E"/>
+      </g></svg>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ TREI FELURI DE TRAFIC -->
+<section class="sec" id="joc">
+  <div class="wrap">
+    <div class="head">
+      <span class="kicker" data-i18n="k1">Jocul</span>
+      <h2 data-i18n="h1">Un oras. Trei feluri de trafic.</h2>
+      <p data-i18n="p1">Masinile, trenurile si camioanele folosesc aceleasi strazi si aceleasi intersectii. Fiecare drum pe care il tragi se vede imediat in trafic.</p>
+    </div>
+    <div class="pillars">
+      <article class="pill">
+        <div class="art" aria-hidden="true">
+          <svg viewBox="0 0 360 150" preserveAspectRatio="xMidYMid slice">
+            <rect width="360" height="150" fill="#E2E7DB"/>
+            <path d="M-10 92 H150 L200 42 H380" fill="none" stroke="#C3CABB" stroke-width="46" stroke-linejoin="round"/>
+            <path d="M-10 92 H150 L200 42 H380" fill="none" stroke="#fff" stroke-width="38" stroke-linejoin="round"/>
+            <rect x="26" y="112" width="34" height="30" rx="7" fill="#E8604C"/><rect x="26" y="128" width="34" height="14" rx="4" fill="#B9493A"/>
+            <rect x="300" y="4" width="46" height="30" rx="7" fill="#3E7BD2"/><rect x="300" y="20" width="46" height="14" rx="4" fill="#2C5CA3"/>
+            <g transform="translate(64 84)"><rect width="30" height="16" rx="5" fill="#E8604C"/><rect x="18" y="3" width="8" height="10" rx="2" fill="#F2927F"/></g>
+            <g transform="translate(112 84)"><rect width="30" height="16" rx="5" fill="#3E7BD2"/><rect x="18" y="3" width="8" height="10" rx="2" fill="#76A2E3"/></g>
+            <g transform="translate(232 34)"><rect width="30" height="16" rx="5" fill="#E8604C"/><rect x="18" y="3" width="8" height="10" rx="2" fill="#F2927F"/></g>
+            <circle cx="120" cy="30" r="9" fill="#B5C6A6"/><circle cx="132" cy="36" r="7" fill="#B5C6A6"/><circle cx="262" cy="118" r="10" fill="#B5C6A6"/>
+          </svg>
+        </div>
+        <h3 data-i18n="c1t">Masini</h3>
+        <p data-i18n="c1p">Fiecare casa trimite masini la magazinul de aceeasi culoare. Drumurile le desenezi tu, drept sau in diagonala.</p>
+        <span class="fact"><i style="background:var(--red)"></i><span data-i18n="c1f">Clientii orasului</span></span>
+      </article>
+      <article class="pill">
+        <div class="art" aria-hidden="true">
+          <svg viewBox="0 0 360 150" preserveAspectRatio="xMidYMid slice">
+            <rect width="360" height="150" fill="#E2E7DB"/>
+            <path d="M-10 75 H380" stroke="#8A8F96" stroke-width="18" stroke-dasharray="4 10"/>
+            <path d="M-10 75 H380" stroke="#353A45" stroke-width="5"/>
+            <g transform="translate(46 63)">
+              <rect x="0" y="2" width="50" height="20" rx="4" fill="#C99B5B"/><path d="M6 6l14 12M20 6L6 18M30 6l14 12M44 6L30 18" stroke="#8E6A38" stroke-width="2.4"/>
+              <rect x="56" y="2" width="50" height="20" rx="4" fill="#C99B5B"/><path d="M62 6l14 12M76 6l-14 12M86 6l14 12M100 6l-14 12" stroke="#8E6A38" stroke-width="2.4"/>
+              <rect x="112" y="2" width="50" height="20" rx="4" fill="#C99B5B"/><path d="M118 6l14 12M132 6l-14 12M142 6l14 12M156 6l-14 12" stroke="#8E6A38" stroke-width="2.4"/>
+              <rect x="168" y="0" width="70" height="24" rx="6" fill="#2B303A"/><rect x="176" y="5" width="32" height="14" rx="3" fill="#4A505C"/>
+              <circle cx="236" cy="6" r="3" fill="#F4D35E"/><circle cx="236" cy="18" r="3" fill="#F4D35E"/>
+            </g>
+            <rect x="12" y="104" width="62" height="40" rx="8" fill="#4A505C"/><g stroke="#8E6A38" stroke-width="2"><rect x="20" y="110" width="14" height="12" fill="#C99B5B"/><rect x="38" y="110" width="14" height="12" fill="#C99B5B"/><rect x="20" y="126" width="14" height="12" fill="#C99B5B"/><rect x="38" y="126" width="14" height="12" fill="#C99B5B"/></g>
+            <circle cx="320" cy="124" r="10" fill="#B5C6A6"/><circle cx="300" cy="28" r="8" fill="#B5C6A6"/>
+          </svg>
+        </div>
+        <h3 data-i18n="c2t">Trenuri</h3>
+        <p data-i18n="c2p">Marfa pleaca din depozit pe calea ferata, cate 6 lazi pe tren. Sunt rapide, dar taie drumurile masinilor.</p>
+        <span class="fact"><i style="background:var(--rail)"></i><span data-i18n="c2f">6 lazi de marfa</span></span>
+      </article>
+      <article class="pill">
+        <div class="art" aria-hidden="true">
+          <svg viewBox="0 0 360 150" preserveAspectRatio="xMidYMid slice">
+            <rect width="360" height="150" fill="#E2E7DB"/>
+            <path d="M-10 40 H120 L200 120 H380" fill="none" stroke="#C3CABB" stroke-width="46" stroke-linejoin="round"/>
+            <path d="M-10 40 H120 L200 120 H380" fill="none" stroke="#fff" stroke-width="38" stroke-linejoin="round"/>
+            <g transform="translate(222 110)"><rect width="42" height="20" rx="4" fill="#C99B5B"/><path d="M6 4l12 12M18 4L6 16M24 4l12 12M36 4L24 16" stroke="#8E6A38" stroke-width="2.2"/><rect x="44" y="2" width="18" height="16" rx="4" fill="#4A505C"/></g>
+            <g transform="translate(34 32)"><rect width="30" height="16" rx="5" fill="#E6A823"/><rect x="18" y="3" width="8" height="10" rx="2" fill="#F1C565"/></g>
+            <g transform="translate(150 70) rotate(45)"><rect width="30" height="16" rx="5" fill="#2FA38D"/><rect x="18" y="3" width="8" height="10" rx="2" fill="#68C2B0"/></g>
+            <circle cx="300" cy="40" r="10" fill="#B5C6A6"/><circle cx="60" cy="112" r="9" fill="#B5C6A6"/><circle cx="74" cy="120" r="7" fill="#B5C6A6"/>
+          </svg>
+        </div>
+        <h3 data-i18n="c3t">Camioane</h3>
+        <p data-i18n="c3p">Duc cate 4 lazi pe aceleasi drumuri ca masinile. Ajung oriunde exista sosea, dar intra si ele in trafic.</p>
+        <span class="fact"><i style="background:var(--crate)"></i><span data-i18n="c3f">4 lazi, pe drum</span></span>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ CARACTERISTICI -->
+<section class="sec sec-alt" id="caracteristici">
+  <div class="wrap">
+    <div class="head">
+      <span class="kicker" data-i18n="k2">Caracteristici</span>
+      <h2 data-i18n="h2">Simplu la inceput. Greu de stapanit.</h2>
+      <p data-i18n="p2">Fiecare saptamana aduce case noi, magazine noi si mai multa marfa de dus. Ai la dispozitie unelte simple care se combina in solutii tot mai ingenioase.</p>
+    </div>
+    <div class="feats">
+      <article class="feat"><img src="media/prim-trecere.webp" loading="lazy" width="1200" height="800" alt="Un tren cu marfa trece peste o trecere la nivel cu bariere coborate, iar masinile asteapta" data-i18n-alt="f1a"><div><h3 data-i18n="f1t">Treceri la nivel</h3><p data-i18n="f1p">Unde drumul taie calea ferata pui bariere. Fara ele, un tren grabit si o masina neatenta inseamna accident.</p></div></article>
+      <article class="feat"><img src="media/prim-pasaj.webp" loading="lazy" width="1200" height="800" alt="Un pasaj lung trece pe deasupra unui rau" data-i18n-alt="f2a"><div><h3 data-i18n="f2t">Pasaje peste orice</h3><p data-i18n="f2p">Un drum suspendat sare peste rauri, sine, munti si alte drumuri, pana la 10 patratele dintr-o singura bucata.</p></div></article>
+      <article class="feat"><img src="media/prim-semafor.webp" loading="lazy" width="1200" height="800" alt="Intersectii aglomerate cu semafoare rosii si verzi" data-i18n-alt="f3a"><div><h3 data-i18n="f3t">Semafoare</h3><p data-i18n="f3p">Intersectiile cu trei sau mai multe drumuri se blocheaza repede. Semafoarele lasa masinile sa treaca pe rand.</p></div></article>
+      <article class="feat"><img src="media/prim-giratoriu.webp" loading="lazy" width="1200" height="800" alt="Sens giratoriu intre case albastre si verzi" data-i18n-alt="f4a"><div><h3 data-i18n="f4t">Sensuri giratorii</h3><p data-i18n="f4p">Trafic fluid cand vin masini din toate partile. Mai putine opriri, mai multe livrari.</p></div></article>
+      <article class="feat"><img src="media/prim-depozit.webp" loading="lazy" width="1200" height="800" alt="Depozit gri cu lazi, legat de cale ferata si de drum" data-i18n-alt="f5a"><div><h3 data-i18n="f5t">Depozitele tale</h3><p data-i18n="f5p">Tu alegi cate trenuri si camioane are fiecare depozit si ce culori de magazine aprovizioneaza.</p></div></article>
+      <article class="feat"><img src="media/prim-magazin.webp" loading="lazy" width="1200" height="800" alt="Magazin mare, rosu, ajuns la un nivel superior" data-i18n-alt="f6a"><div><h3 data-i18n="f6t">Magazine care cresc</h3><p data-i18n="f6p">Magazinele bine servite urca pana la nivelul 3. Mai mari, cu mai multi clienti si mai multa presiune pe drumuri.</p></div></article>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ ORASE -->
+<section class="sec" id="orase">
+  <div class="wrap">
+    <div class="head">
+      <span class="kicker" data-i18n="k3">Orase</span>
+      <h2 data-i18n="h3">Cinci orase romanesti</h2>
+      <p data-i18n="p3">Fiecare harta are relieful ei: rauri, lacuri, munti si mare. Fa 80 de livrari intr-un oras ca sa-l deblochezi pe urmatorul.</p>
+    </div>
+    <div class="cities">
+      <article class="city"><img src="media/oras-0.webp" loading="lazy" width="1200" height="750" alt="Harta orasului Cluj" data-i18n-alt="cl0a"><div><h3>Cluj <span class="diff" role="img" aria-label="1/5"><i class="on"></i><i></i><i></i><i></i><i></i></span></h3><p data-i18n="cl0">Un rau taie orasul de la nord la sud. Primele poduri si pasaje conteaza.</p><small data-i18n="open">Deschis de la inceput</small></div></article>
+      <article class="city"><img src="media/oras-1.webp" loading="lazy" width="1200" height="750" alt="Harta orasului Timisoara" data-i18n-alt="cl1a"><div><h3>Timisoara <span class="diff" role="img" aria-label="2/5"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span></h3><p data-i18n="cl1">Un rau de la vest la est si un lac in cale. Orasul se intinde pe ambele maluri.</p><small data-i18n="un1">Dupa 80 de livrari in Cluj</small></div></article>
+      <article class="city"><img src="media/oras-2.webp" loading="lazy" width="1200" height="750" alt="Harta orasului Brasov" data-i18n-alt="cl2a"><div><h3>Brasov <span class="diff" role="img" aria-label="3/5"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span></h3><p data-i18n="cl2">Munti pe margini si un rau prin mijloc. Loc putin, trasee gandite atent.</p><small data-i18n="un2">Dupa 80 de livrari in Timisoara</small></div></article>
+      <article class="city"><img src="media/oras-3.webp" loading="lazy" width="1200" height="750" alt="Harta orasului Constanta" data-i18n-alt="cl3a"><div><h3>Constanta <span class="diff" role="img" aria-label="4/5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></h3><p data-i18n="cl3">Marea pe o latura si un lac. Nisip in loc de iarba si magazine care cer mult.</p><small data-i18n="un3">Dupa 80 de livrari in Brasov</small></div></article>
+      <article class="city"><img src="media/oras-4.webp" loading="lazy" width="1200" height="750" alt="Harta orasului Bucuresti" data-i18n-alt="cl4a"><div><h3 data-i18n="bucName">Bucuresti <span class="diff" role="img" aria-label="5/5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></h3><p data-i18n="cl4">Rau, lacuri si cea mai mare cerere. Cel mai greu oras din joc.</p><small data-i18n="un4">Dupa 80 de livrari in Constanta</small></div></article>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ CUM SE JOACA -->
+<section class="sec sec-dark" id="cum">
+  <div class="wrap">
+    <div class="head">
+      <span class="kicker" data-i18n="k4">Cum se joaca</span>
+      <h2 data-i18n="h4">Patru reguli. O mie de orase.</h2>
+      <p data-i18n="p4">Inveti in doua minute. Fiecare partida iese altfel, pentru ca orasul creste de fiecare data in alta parte.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><b>01</b><h3 data-i18n="st1t">Leaga casele</h3><p data-i18n="st1p">Trage un drum de la iesirea casei pana la magazinul de aceeasi culoare.</p></div>
+      <div class="step"><b>02</b><h3 data-i18n="st2t">Adu marfa</h3><p data-i18n="st2p">Uneste depozitele cu magazinele prin cale ferata sau trimite camioane pe drum.</p></div>
+      <div class="step"><b>03</b><h3 data-i18n="st3t">Evita blocajele</h3><p data-i18n="st3p">Bariere sau pasaje unde drumul intalneste sina. Semafoare si giratorii unde se aglomereaza.</p></div>
+      <div class="step"><b>04</b><h3 data-i18n="st4t">Alege si rezista</h3><p data-i18n="st4p">La final de saptamana primesti drum nou si alegi un bonus. Pierzi cand un magazin asteapta prea mult.</p></div>
+    </div>
+    <div class="controls">
+      <div class="ctl">
+        <h3 data-i18n="ctPc">Pe calculator</h3>
+        <ul>
+          <li><kbd data-i18n="kMouse">Mouse</kbd><span data-i18n="ctBuild">construiesti</span></li>
+          <li><kbd data-i18n="kRight">Click dreapta</kbd><span data-i18n="ctErase">stergi</span></li>
+          <li><kbd data-i18n="kWheel">Rotita</kbd><span data-i18n="ctZoom">mareste harta</span></li>
+          <li><kbd>1</kbd>&ndash;<kbd>7</kbd><span data-i18n="ctTools">unelte: drum, cale ferata, bariera, pasaj, semafor, giratoriu, sterge</span></li>
+          <li><kbd>Space</kbd><span data-i18n="ctPause">pauza</span></li>
+          <li><kbd>F</kbd><span data-i18n="ctSpeed">viteza 1x / 2x / 3x</span></li>
+        </ul>
+      </div>
+      <div class="ctl">
+        <h3 data-i18n="ctPh">Pe telefon</h3>
+        <ul>
+          <li><kbd data-i18n="kOne">Un deget</kbd><span data-i18n="ctBuild2">construiesti</span></li>
+          <li><kbd data-i18n="kTwo">Doua degete</kbd><span data-i18n="ctPinch">apropii, departezi si muti harta</span></li>
+          <li><kbd>X</kbd><span data-i18n="ctErase2">unealta Sterge</span></li>
+          <li><kbd data-i18n="kFit">Colturi</kbd><span data-i18n="ctFit">arata din nou toata harta</span></li>
+          <li><kbd data-i18n="kLand">Orizontal</kbd><span data-i18n="ctLand">uneltele trec in stanga, harta e mai mare</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ GALERIE -->
+<section class="sec" id="galerie">
+  <div class="wrap">
+    <div class="head">
+      <span class="kicker" data-i18n="k5">Galerie</span>
+      <h2 data-i18n="h5">Cum arata in joc</h2>
+      <p data-i18n="p5">Capturi din versiunea 1.0, cu interfata jocului.</p>
+    </div>
+    <div class="gallery" id="gal">
+      <button type="button" data-i="0"><img src="media/captura-1-mic.webp" loading="lazy" width="800" height="450" alt="Cluj, saptamana 7" data-i18n-alt="g1"><span data-i18n="g1">Cluj, saptamana 7</span></button>
+      <button type="button" data-i="1"><img src="media/captura-2-mic.webp" loading="lazy" width="800" height="450" alt="Brasov, saptamana 6" data-i18n-alt="g2"><span data-i18n="g2">Brasov, saptamana 6</span></button>
+      <button type="button" data-i="2"><img src="media/captura-3-mic.webp" loading="lazy" width="800" height="450" alt="Constanta, saptamana 6" data-i18n-alt="g3"><span data-i18n="g3">Constanta, saptamana 6</span></button>
+      <button type="button" data-i="3"><img src="media/captura-4-mic.webp" loading="lazy" width="800" height="450" alt="Bucuresti, saptamana 7" data-i18n-alt="g4"><span data-i18n="g4">Bucuresti, saptamana 7</span></button>
+      <button type="button" data-i="4"><img src="media/captura-5-mic.webp" loading="lazy" width="800" height="450" alt="Timisoara, saptamana 5" data-i18n-alt="g5"><span data-i18n="g5">Timisoara, saptamana 5</span></button>
+    </div>
+  </div>
+  <dialog class="lb" id="lb" aria-label="Galerie">
+    <figure>
+      <img id="lbImg" alt="">
+      <figcaption id="lbCap"></figcaption>
+      <button class="x" type="button" id="lbX" aria-label="Inchide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      <button class="pv" type="button" id="lbP" aria-label="Inapoi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <button class="nx" type="button" id="lbN" aria-label="Inainte"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+    </figure>
+  </dialog>
+</section>
+
+<!-- ================================================================ PLATFORME -->
+<section class="sec sec-alt" id="platforme">
+  <div class="wrap">
+    <div class="head">
+      <span class="kicker" data-i18n="k6">Platforme</span>
+      <h2 data-i18n="h6">Joaca oriunde</h2>
+      <p data-i18n="p6">Acelasi joc pe calculator si pe telefon. Progresul se salveaza pe fiecare dispozitiv.</p>
+    </div>
+    <div class="plat">
+      <div class="pcards">
+        <div class="pcard">
+          <div class="ic" style="background:#FDE7E3;color:var(--red)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></div>
+          <h3 data-i18n="pl1t">In browser</h3>
+          <p data-i18n="pl1p">Pe calculator sau laptop, direct din pagina. Fara instalare si fara cont.</p>
+          <div class="row"><a class="btn btn-main" href="joaca/" data-i18n="playNow">Joaca acum</a><a class="small-link" href="https://github.com/SereSS26/Joc-Sine-si-Sosele/raw/main/sine-si-sosele-web.zip" data-i18n="dlZip">Descarca pentru joc offline (ZIP)</a></div>
+        </div>
+        <div class="pcard">
+          <div class="ic" style="background:#E2ECFA;color:var(--blue)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2.5"/><path d="M11 18h2"/></svg></div>
+          <h3 data-i18n="pl2t">Pe telefon</h3>
+          <p data-i18n="pl2p">Deschide jocul pe telefon si adauga-l pe ecranul principal. Porneste ca o aplicatie, pe tot ecranul, si merge fara internet.</p>
+          <ol>
+            <li data-i18n="pl2a">iPhone: Safari, butonul Share, apoi Add to Home Screen</li>
+            <li data-i18n="pl2b">Android: Chrome, meniul cu trei puncte, apoi Install app</li>
+          </ol>
+        </div>
+        <div class="pcard">
+          <div class="ic" style="background:#EDE8F6;color:var(--purple)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M4 7.5l8 4.5 8-4.5M12 12v9"/></svg></div>
+          <h3><span data-i18n="pl3t">Pe Steam</span> <span class="tag" style="background:var(--land)" data-i18n="soon">In curand</span></h3>
+          <p data-i18n="pl3p">Versiunea pentru Windows si macOS se pregateste pentru Steam. Urmareste proiectul pe GitHub ca sa afli primul.</p>
+          <div class="row"><a class="btn btn-ghost" href="https://github.com/SereSS26/Joc-Sine-si-Sosele"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5"/></svg><span data-i18n="gh">Proiectul pe GitHub</span></a></div>
+        </div>
+      </div>
+      <div class="phones">
+        <div class="phone land"><img src="media/telefon-orizontal.webp" loading="lazy" width="1266" height="585" alt="Jocul pe un telefon tinut orizontal" data-i18n-alt="phL"></div>
+        <div class="phone port"><img src="media/telefon-vertical.webp" loading="lazy" width="585" height="1266" alt="Jocul pe un telefon tinut vertical" data-i18n-alt="phP"></div>
+        <div class="qrbox"><svg class="qr" viewBox="-2 -2 37 37" role="img" aria-labelledby="qrT"><title id="qrT">QR</title><rect x="-2" y="-2" width="37" height="37" rx="2" fill="#fff"/><path fill="#22262D" d="M0 0h7v1h-7zM9 0h2v1h-2zM12 0h1v1h-1zM14 0h1v1h-1zM21 0h1v1h-1zM26 0h7v1h-7zM0 1h1v1h-1zM6 1h1v1h-1zM8 1h1v1h-1zM13 1h2v1h-2zM16 1h2v1h-2zM22 1h1v1h-1zM26 1h1v1h-1zM32 1h1v1h-1zM0 2h1v1h-1zM2 2h3v1h-3zM6 2h1v1h-1zM8 2h2v1h-2zM11 2h3v1h-3zM16 2h3v1h-3zM21 2h4v1h-4zM26 2h1v1h-1zM28 2h3v1h-3zM32 2h1v1h-1zM0 3h1v1h-1zM2 3h3v1h-3zM6 3h1v1h-1zM8 3h5v1h-5zM15 3h1v1h-1zM19 3h4v1h-4zM24 3h1v1h-1zM26 3h1v1h-1zM28 3h3v1h-3zM32 3h1v1h-1zM0 4h1v1h-1zM2 4h3v1h-3zM6 4h1v1h-1zM9 4h1v1h-1zM15 4h1v1h-1zM18 4h1v1h-1zM21 4h1v1h-1zM23 4h1v1h-1zM26 4h1v1h-1zM28 4h3v1h-3zM32 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM10 5h2v1h-2zM13 5h1v1h-1zM16 5h1v1h-1zM20 5h2v1h-2zM24 5h1v1h-1zM26 5h1v1h-1zM32 5h1v1h-1zM0 6h7v1h-7zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h1v1h-1zM24 6h1v1h-1zM26 6h7v1h-7zM8 7h1v1h-1zM10 7h1v1h-1zM12 7h1v1h-1zM14 7h1v1h-1zM19 7h2v1h-2zM22 7h1v1h-1zM0 8h1v1h-1zM6 8h1v1h-1zM8 8h1v1h-1zM13 8h1v1h-1zM15 8h1v1h-1zM17 8h1v1h-1zM19 8h1v1h-1zM23 8h1v1h-1zM25 8h2v1h-2zM29 8h3v1h-3zM0 9h1v1h-1zM2 9h4v1h-4zM7 9h3v1h-3zM14 9h2v1h-2zM18 9h2v1h-2zM21 9h1v1h-1zM23 9h1v1h-1zM28 9h3v1h-3zM0 10h1v1h-1zM4 10h1v1h-1zM6 10h2v1h-2zM9 10h1v1h-1zM11 10h1v1h-1zM15 10h1v1h-1zM18 10h1v1h-1zM22 10h1v1h-1zM25 10h2v1h-2zM28 10h1v1h-1zM30 10h2v1h-2zM1 11h3v1h-3zM7 11h1v1h-1zM9 11h2v1h-2zM12 11h1v1h-1zM14 11h2v1h-2zM20 11h1v1h-1zM22 11h1v1h-1zM25 11h1v1h-1zM27 11h5v1h-5zM6 12h2v1h-2zM11 12h1v1h-1zM13 12h2v1h-2zM16 12h5v1h-5zM23 12h2v1h-2zM26 12h2v1h-2zM31 12h1v1h-1zM0 13h2v1h-2zM7 13h2v1h-2zM10 13h3v1h-3zM14 13h1v1h-1zM16 13h1v1h-1zM19 13h1v1h-1zM23 13h1v1h-1zM25 13h1v1h-1zM29 13h1v1h-1zM31 13h2v1h-2zM1 14h6v1h-6zM10 14h3v1h-3zM17 14h2v1h-2zM20 14h1v1h-1zM25 14h2v1h-2zM31 14h1v1h-1zM1 15h1v1h-1zM4 15h1v1h-1zM8 15h2v1h-2zM11 15h1v1h-1zM15 15h1v1h-1zM18 15h1v1h-1zM20 15h1v1h-1zM22 15h1v1h-1zM25 15h1v1h-1zM29 15h2v1h-2zM32 15h1v1h-1zM0 16h2v1h-2zM6 16h4v1h-4zM13 16h1v1h-1zM17 16h2v1h-2zM20 16h1v1h-1zM24 16h2v1h-2zM27 16h2v1h-2zM32 16h1v1h-1zM0 17h1v1h-1zM2 17h1v1h-1zM4 17h1v1h-1zM9 17h4v1h-4zM14 17h1v1h-1zM16 17h8v1h-8zM25 17h2v1h-2zM29 17h2v1h-2zM32 17h1v1h-1zM0 18h1v1h-1zM2 18h1v1h-1zM5 18h3v1h-3zM10 18h1v1h-1zM15 18h1v1h-1zM19 18h1v1h-1zM22 18h6v1h-6zM29 18h2v1h-2zM32 18h1v1h-1zM2 19h3v1h-3zM7 19h2v1h-2zM11 19h2v1h-2zM14 19h5v1h-5zM23 19h4v1h-4zM28 19h5v1h-5zM0 20h3v1h-3zM4 20h5v1h-5zM12 20h1v1h-1zM14 20h1v1h-1zM16 20h1v1h-1zM19 20h1v1h-1zM22 20h1v1h-1zM24 20h2v1h-2zM27 20h3v1h-3zM0 21h6v1h-6zM7 21h1v1h-1zM9 21h1v1h-1zM11 21h1v1h-1zM16 21h4v1h-4zM22 21h2v1h-2zM27 21h4v1h-4zM0 22h1v1h-1zM2 22h1v1h-1zM4 22h1v1h-1zM6 22h2v1h-2zM10 22h1v1h-1zM12 22h6v1h-6zM20 22h1v1h-1zM22 22h1v1h-1zM28 22h4v1h-4zM0 23h1v1h-1zM2 23h1v1h-1zM5 23h1v1h-1zM7 23h2v1h-2zM10 23h1v1h-1zM12 23h1v1h-1zM18 23h2v1h-2zM23 23h4v1h-4zM30 23h1v1h-1zM0 24h2v1h-2zM3 24h1v1h-1zM6 24h1v1h-1zM12 24h1v1h-1zM14 24h3v1h-3zM19 24h2v1h-2zM22 24h8v1h-8zM32 24h1v1h-1zM8 25h2v1h-2zM11 25h3v1h-3zM15 25h1v1h-1zM18 25h4v1h-4zM23 25h2v1h-2zM28 25h1v1h-1zM30 25h2v1h-2zM0 26h7v1h-7zM9 26h1v1h-1zM12 26h1v1h-1zM14 26h3v1h-3zM18 26h1v1h-1zM20 26h1v1h-1zM22 26h3v1h-3zM26 26h1v1h-1zM28 26h1v1h-1zM30 26h2v1h-2zM0 27h1v1h-1zM6 27h1v1h-1zM10 27h6v1h-6zM19 27h1v1h-1zM23 27h2v1h-2zM28 27h5v1h-5zM0 28h1v1h-1zM2 28h3v1h-3zM6 28h1v1h-1zM9 28h3v1h-3zM13 28h1v1h-1zM18 28h1v1h-1zM22 28h1v1h-1zM24 28h6v1h-6zM31 28h2v1h-2zM0 29h1v1h-1zM2 29h3v1h-3zM6 29h1v1h-1zM12 29h3v1h-3zM16 29h2v1h-2zM19 29h3v1h-3zM23 29h3v1h-3zM27 29h3v1h-3zM31 29h2v1h-2zM0 30h1v1h-1zM2 30h3v1h-3zM6 30h1v1h-1zM10 30h1v1h-1zM14 30h1v1h-1zM16 30h4v1h-4zM24 30h2v1h-2zM27 30h2v1h-2zM30 30h3v1h-3zM0 31h1v1h-1zM6 31h1v1h-1zM9 31h1v1h-1zM12 31h1v1h-1zM15 31h2v1h-2zM23 31h1v1h-1zM25 31h6v1h-6zM0 32h7v1h-7zM8 32h2v1h-2zM13 32h2v1h-2zM17 32h1v1h-1zM22 32h6v1h-6zM29 32h1v1h-1zM31 32h1v1h-1z"/></svg><p data-i18n="qr">Scaneaza cu camera telefonului ca sa deschizi jocul.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ CE URMEAZA -->
+<section class="sec" id="viitor">
+  <div class="wrap">
+    <div class="head">
+      <span class="kicker" data-i18n="k7">Ce urmeaza</span>
+      <h2 data-i18n="h7">Orasul abia a inceput</h2>
+      <p data-i18n="p7">Idei la care lucram pentru versiunile urmatoare.</p>
+    </div>
+    <div class="road">
+      <div class="ri" style="--c:var(--red)"><span class="tag" style="background:var(--land)" data-i18n="plan">Planificat</span><h3 data-i18n="r1t">Autobuze si statii</h3><p data-i18n="r1p">Un autobuz ia mai multi oameni deodata si elibereaza strazile.</p></div>
+      <div class="ri" style="--c:var(--blue)"><span class="tag" style="background:var(--land)" data-i18n="plan">Planificat</span><h3 data-i18n="r2t">Ore de varf si noapte</h3><p data-i18n="r2p">Valuri de trafic dimineata si seara, iar noaptea orasul se aprinde.</p></div>
+      <div class="ri" style="--c:var(--yellow)"><span class="tag" style="background:var(--land)" data-i18n="plan">Planificat</span><h3 data-i18n="r3t">Provocarea zilei</h3><p data-i18n="r3p">Aceeasi harta pentru toti jucatorii, in fiecare zi, cu clasament.</p></div>
+      <div class="ri" style="--c:var(--teal)"><span class="tag" style="background:var(--land)" data-i18n="plan">Planificat</span><h3 data-i18n="r4t">Orase din lume</h3><p data-i18n="r4p">Harti noi dincolo de Romania, fiecare cu relieful si ritmul ei.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ FINAL -->
+<section class="sec sec-alt final dots">
+  <div class="wrap">
+    <h2><span data-i18n="fin1">Orasul tau</span><span data-i18n="fin2">asteapta primul drum</span></h2>
+    <div class="cta"><a class="btn btn-red" href="joaca/"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z"/></svg><span data-i18n="playFree">Joaca gratuit acum</span></a></div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <a class="brand" href="#top"><img src="joaca/icon-192.png" alt="" width="32" height="32"><span>Sine si <b>Sosele</b></span></a>
+    <nav aria-label="Linkuri">
+      <a href="joaca/" data-i18n="play">Joaca</a>
+      <a href="https://github.com/SereSS26/Joc-Sine-si-Sosele" data-i18n="code">Codul sursa</a>
+      <a href="https://github.com/SereSS26/Joc-Sine-si-Sosele#readme" data-i18n="docs">Documentatie</a>
+    </nav>
+    <p class="legal" data-i18n="legal">Sine si Sosele, versiunea 1.0. Facut in Romania de SereSS26. &copy; 2026, toate drepturile rezervate. Fonturi: Big Shoulders Display si Barlow (SIL Open Font License).</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var T={
+    ro:{},
+    en:{
+      skip:'Skip to content', navGame:'The game', navFeat:'Features', navCities:'Cities', navGallery:'Gallery', navPlat:'Platforms', play:'Play',
+      tagFree:'Free in your browser', tagVer:'Version 1.0',
+      lead:'Draw roads and railways in a town that grows every week. Cars head to the shops, trains and trucks bring the goods, and you keep everything moving.',
+      playFree:'Play free now', discover:'Discover the game', mPc:'Computer', mPhone:'Phone and tablet', mLang:'English and Romanian', mOff:'Works offline',
+      vidAria:'Gameplay footage: the town of Cluj with cars, trains and trucks on the move', vidCap:'Captured in game · Cluj, week 7',
+      s1:'Romanian cities', s2:'kinds of vehicles', s3:'bonuses to pick from every week', s4:'tiles an overpass can span',
+      k1:'The game', h1:'One town. Three kinds of traffic.', p1:'Cars, trains and trucks share the same streets and the same junctions. Every road you draw shows up in the traffic right away.',
+      c1t:'Cars', c1p:'Every house sends cars to the shop of the same colour. You draw the roads, straight or diagonal.', c1f:'The town’s customers',
+      c2t:'Trains', c2p:'Goods leave the depot by rail, 6 crates per train. Fast, but they cut across the cars’ roads.', c2f:'6 crates of goods',
+      c3t:'Trucks', c3p:'They carry 4 crates on the same roads as the cars. They reach anywhere there is a road, but they join the traffic too.', c3f:'4 crates, by road',
+      k2:'Features', h2:'Easy to start. Hard to master.', p2:'Every week brings new houses, new shops and more goods to deliver. Simple tools combine into smarter and smarter solutions.',
+      f1t:'Level crossings', f1p:'Where a road crosses the railway, add barriers. Without them, a hurried train and a careless car mean an accident.', f1a:'A goods train passes a level crossing with the barriers down while cars wait',
+      f2t:'Overpasses', f2p:'A raised road jumps over rivers, rails, mountains and other roads, up to 10 tiles in a single piece.', f2a:'A long overpass crossing a river',
+      f3t:'Traffic lights', f3p:'Junctions with three or more roads clog up fast. Traffic lights let the cars through in turn.', f3a:'Busy junctions with red and green traffic lights',
+      f4t:'Roundabouts', f4p:'Smooth traffic when cars arrive from every side. Fewer stops, more deliveries.', f4a:'A roundabout between blue and green houses',
+      f5t:'Your depots', f5p:'You decide how many trains and trucks each depot runs and which shop colours it supplies.', f5a:'A grey depot with crates, linked to the railway and the road',
+      f6t:'Growing shops', f6p:'Well-served shops grow up to level 3. Bigger, with more customers and more pressure on your roads.', f6a:'A large red shop that has levelled up',
+      k3:'Cities', h3:'Five Romanian cities', p3:'Every map has its own terrain: rivers, lakes, mountains and the sea. Make 80 deliveries in one city to unlock the next.',
+      cl0:'A river splits the town from north to south. Your first bridges and overpasses matter.', cl1:'A river from west to east and a lake in the way. The town spreads across both banks.',
+      cl2:'Mountains on the edges and a river through the middle. Little room, careful routes.', cl3:'The sea on one side and a lake. Sand instead of grass, and demanding shops.',
+      cl4:'A river, lakes and the highest demand. The hardest city in the game.',
+      cl0a:'Map of Cluj', cl1a:'Map of Timisoara', cl2a:'Map of Brasov', cl3a:'Map of Constanta', cl4a:'Map of Bucharest',
+      open:'Open from the start', un1:'After 80 deliveries in Cluj', un2:'After 80 deliveries in Timisoara', un3:'After 80 deliveries in Brasov', un4:'After 80 deliveries in Constanta',
+      k4:'How to play', h4:'Four rules. A thousand towns.', p4:'Learn it in two minutes. Every game plays out differently, because the town grows somewhere new each time.',
+      st1t:'Link the houses', st1p:'Draw a road from a house’s exit to the shop of the same colour.',
+      st2t:'Bring the goods', st2p:'Connect depots to shops by rail, or send trucks by road.',
+      st3t:'Avoid jams', st3p:'Barriers or overpasses where road meets rail. Lights and roundabouts where traffic piles up.',
+      st4t:'Choose and survive', st4p:'At the end of each week you get new road and pick a bonus. You lose when a shop waits too long.',
+      ctPc:'On a computer', kMouse:'Mouse', ctBuild:'build', kRight:'Right click', ctErase:'erase', kWheel:'Wheel', ctZoom:'zoom the map',
+      ctTools:'tools: road, rail, barrier, overpass, lights, roundabout, erase', ctPause:'pause', ctSpeed:'speed 1x / 2x / 3x',
+      ctPh:'On a phone', kOne:'One finger', ctBuild2:'build', kTwo:'Two fingers', ctPinch:'pinch to zoom and pan', ctErase2:'Erase tool',
+      kFit:'Corners', ctFit:'show the whole map again', kLand:'Landscape', ctLand:'tools move to the left for a bigger map',
+      k5:'Gallery', h5:'How it looks in game', p5:'Screenshots from version 1.0, with the game’s interface.',
+      g1:'Cluj, week 7', g2:'Brasov, week 6', g3:'Constanta, week 6', g4:'Bucharest, week 7', g5:'Timisoara, week 5',
+      k6:'Platforms', h6:'Play anywhere', p6:'The same game on computer and phone. Progress is saved on each device.',
+      pl1t:'In the browser', pl1p:'On a computer or laptop, right from the page. No install, no account.', playNow:'Play now', dlZip:'Download to play offline (ZIP)',
+      pl2t:'On your phone', pl2p:'Open the game on your phone and add it to the home screen. It launches like an app, full screen, and works offline.',
+      pl2a:'iPhone: Safari, the Share button, then Add to Home Screen', pl2b:'Android: Chrome, the three-dot menu, then Install app',
+      pl3t:'On Steam', soon:'Coming soon', pl3p:'The Windows and macOS version is being prepared for Steam. Follow the project on GitHub to hear first.', gh:'Project on GitHub',
+      phL:'The game on a phone held sideways', phP:'The game on a phone held upright', qr:'Scan with your phone camera to open the game.',
+      k7:'What’s next', h7:'The town has only just begun', p7:'Ideas we are working on for upcoming versions.', plan:'Planned',
+      r1t:'Buses and stops', r1p:'A bus carries many people at once and frees up the streets.', r2t:'Rush hour and night', r2p:'Waves of traffic morning and evening, and the town lights up at night.',
+      r3t:'Daily challenge', r3p:'The same map for every player each day, with a leaderboard.', r4t:'Cities of the world', r4p:'New maps beyond Romania, each with its own terrain and rhythm.',
+      fin1:'Your town', fin2:'is waiting for its first road', code:'Source code', docs:'Documentation',
+      legal:'Sine si Sosele, version 1.0. Made in Romania by SereSS26. © 2026, all rights reserved. Fonts: Big Shoulders Display and Barlow (SIL Open Font License).',
+      _title:'Sine si Sosele - a traffic game with cars, trains and trucks',
+      _pause:'Pause the video', _playv:'Play the video', _close:'Close', _prev:'Previous', _next:'Next', _gal:'Gallery'
+    }
+  };
+  // textele romanesti sunt chiar cele din pagina: le citim o data
+  var nodes=document.querySelectorAll('[data-i18n],[data-i18n-alt],[data-i18n-aria]');
+  nodes.forEach(function(n){
+    var k=n.getAttribute('data-i18n'); if(k&&!(k in T.ro)) T.ro[k]=n.innerHTML;
+    var a=n.getAttribute('data-i18n-alt'); if(a&&!(('alt:'+a) in T.ro)) T.ro['alt:'+a]=n.getAttribute('alt');
+    var r=n.getAttribute('data-i18n-aria'); if(r) T.ro['aria:'+r]=n.getAttribute('aria-label');
+  });
+  T.ro._title=document.title; T.ro._pause='Opreste filmarea'; T.ro._playv='Porneste filmarea'; T.ro._close='Inchide'; T.ro._prev='Inapoi'; T.ro._next='Inainte'; T.ro._gal='Galerie';
+  var lang='ro';
+  function t(k){ var v=T[lang][k]; return v==null?T.ro[k]:v; }
+  function apply(l){
+    lang=l; document.documentElement.lang=l;
+    nodes.forEach(function(n){
+      var k=n.getAttribute('data-i18n');
+      if(k&&k!=='bucName'){ if(l==='ro') n.innerHTML=T.ro[k]; else if(T[l][k]!=null) n.textContent=T[l][k]; }
+      var a=n.getAttribute('data-i18n-alt'); if(a) n.setAttribute('alt', l==='ro'?T.ro['alt:'+a]:(T[l][a]||T.ro['alt:'+a]));
+      var r=n.getAttribute('data-i18n-aria'); if(r) n.setAttribute('aria-label', l==='ro'?T.ro['aria:'+r]:(T[l][r]||T.ro['aria:'+r]));
+    });
+    // Bucuresti -> Bucharest in engleza (pastram bulinele de dificultate)
+    var bh=document.querySelector('[data-i18n="bucName"]'); if(bh&&bh.firstChild) bh.firstChild.nodeValue=(l==='en'?'Bucharest ':'Bucuresti ');
+    document.title=t('_title');
+    document.querySelectorAll('.lang button').forEach(function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-lang')===l)); });
+    setVidLabel(); lbLabels();
+    try{ localStorage.setItem('sss-lang',l); }catch(e){}
+  }
+  document.querySelectorAll('.lang button').forEach(function(b){ b.addEventListener('click',function(){ apply(b.getAttribute('data-lang')); }); });
+
+  // ---- video: porneste singur doar daca utilizatorul nu a cerut mai putina miscare
+  var vid=document.getElementById('vid'), vbtn=document.getElementById('vbtn'), vico=document.getElementById('vico');
+  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var PAUSE='M7 5h3.5v14H7zM13.5 5H17v14h-3.5z', PLAY='M8 5.5v13a1 1 0 0 0 1.5.86l10.4-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z';
+  function setVidLabel(){ var p=vid.paused; vico.setAttribute('d',p?PLAY:PAUSE); vbtn.setAttribute('aria-label',p?t('_playv'):t('_pause')); }
+  vid.addEventListener('play',setVidLabel); vid.addEventListener('pause',setVidLabel);
+  vbtn.addEventListener('click',function(){ if(vid.paused){ vid.play(); } else vid.pause(); });
+  if(!reduce){ vid.autoplay=true; var pr=vid.play(); if(pr&&pr.catch) pr.catch(function(){ setVidLabel(); }); }
+  // opreste video-ul cand nu se vede (economie de baterie)
+  if('IntersectionObserver' in window){
+    var userPaused=false; vbtn.addEventListener('click',function(){ userPaused=vid.paused; });
+    new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ if(!reduce&&!userPaused) vid.play().catch(function(){}); } else vid.pause(); }); },{threshold:.15}).observe(vid);
+  }
+
+  // ---- bara de sus cu umbra dupa derulare
+  var nav=document.getElementById('nav');
+  function onScroll(){ nav.classList.toggle('scrolled', window.scrollY>8); }
+  window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+
+  // ---- galerie (lightbox)
+  var lb=document.getElementById('lb'), lbImg=document.getElementById('lbImg'), lbCap=document.getElementById('lbCap'), cur=0;
+  var btns=[].slice.call(document.querySelectorAll('#gal button'));
+  function show(i){ cur=(i+btns.length)%btns.length; var im=btns[cur].querySelector('img'); lbImg.src='media/captura-'+(cur+1)+'.webp'; lbImg.alt=im.alt; lbCap.textContent=im.alt; }
+  function lbLabels(){ document.getElementById('lbX').setAttribute('aria-label',t('_close')); document.getElementById('lbP').setAttribute('aria-label',t('_prev')); document.getElementById('lbN').setAttribute('aria-label',t('_next')); lb.setAttribute('aria-label',t('_gal')); if(lb.open) show(cur); }
+  btns.forEach(function(b,i){ b.addEventListener('click',function(){ show(i); if(lb.showModal) lb.showModal(); else lb.setAttribute('open',''); }); });
+  document.getElementById('lbX').addEventListener('click',function(){ lb.close(); });
+  document.getElementById('lbP').addEventListener('click',function(){ show(cur-1); });
+  document.getElementById('lbN').addEventListener('click',function(){ show(cur+1); });
+  lb.addEventListener('click',function(e){ if(e.target===lb) lb.close(); });
+  lb.addEventListener('keydown',function(e){ if(e.key==='ArrowLeft') show(cur-1); if(e.key==='ArrowRight') show(cur+1); });
+
+  // ---- limba: ?lang=en, apoi alegerea salvata, apoi limba browserului
+  var q=(location.search.match(/[?&]lang=(ro|en)/)||[])[1], saved=null;
+  try{ saved=localStorage.getItem('sss-lang'); }catch(e){}
+  var nav_=(navigator.languages||[navigator.language||'ro']).join(',').toLowerCase();
+  apply(q||saved||(/(^|,)ro/.test(nav_)?'ro':'en'));
+})();
+</script>
+</body>
+</html>

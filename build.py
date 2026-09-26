@@ -8,9 +8,10 @@
 #   game/index.html            acelasi joc, pentru aplicatia desktop (Electron / Steam)
 #   mobile/                    versiunea de telefon, instalabila (PWA), merge fara internet
 #   sine-si-sosele-web.zip     continutul lui mobile/, gata de urcat pe itch.io
+#   docs/joaca/                aceeasi versiune, pentru pagina de prezentare (GitHub Pages)
 #
 # Are nevoie de Python 3 si Pillow (pip3 install pillow) pentru iconitele de telefon.
-import base64, json, os, zipfile
+import base64, json, os, shutil, zipfile
 from PIL import Image
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -74,3 +75,9 @@ mk.alpha_composite(ico.resize((440, 440), Image.LANCZOS), (36, 36)); mk.save(os.
 with zipfile.ZipFile(p('sine-si-sosele-web.zip'), 'w', zipfile.ZIP_DEFLATED) as z:
     for f in sorted(os.listdir(M)): z.write(os.path.join(M, f), f)
 print('telefon ok', sorted(os.listdir(M)))
+
+# ---------------- pagina de prezentare (GitHub Pages din folderul docs/): jocul jucabil la /joaca/
+J = p('docs', 'joaca')
+os.makedirs(J, exist_ok=True)
+for f in sorted(os.listdir(M)): shutil.copy(os.path.join(M, f), os.path.join(J, f))
+print('pagina ok: docs/joaca/')
